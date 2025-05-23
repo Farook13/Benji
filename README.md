@@ -1,20 +1,8 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/97418751/212598655-d7637a29-cba8-4ed6-92a4-6534d394b0f7.jpg" alt="ᴋᴜᴛᴛᴜ ʙᴏᴛ™ Logo">
 </p>
 <h1 align="center">
-  <b>ᴋᴜᴛᴛᴜ ʙᴏᴛ™</b>
+  <b>ʙᴏᴛ™</b>
 </h1>
-
-
-[![Stars](https://img.shields.io/github/stars/GouthamSER/KuttuBot?style=flat-square&color=yellow)](https://github.com/GouthamSER/KuttuBot/stargazers)
-[![Forks](https://img.shields.io/github/forks/GouthamSER/KuttuBot?style=flat-square&color=orange)](https://github.com/GouthamSER/KuttuBot/fork)
-[![Size](https://img.shields.io/github/repo-size/GouthamSER/KuttuBot?style=flat-square&color=green)](https://github.com/GouthamSER/KuttuBot/)   
-[![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/GouthamSER/KuttuBot)   
-[![Contributors](https://img.shields.io/github/contributors/GouthamSER/KuttuBot?style=flat-square&color=green)](https://github.com/GouthamSER/KuttuBot/graphs/contributors)
-[![License](https://img.shields.io/badge/License-AGPL-blue)](https://github.com/GouthamSER/KuttuBot/blob/main/LICENSE)
-[![Sparkline](https://stars.medv.io/GouthamSER/KuttuBot.svg)](https://github.com/GouthamSER/KuttuBot)
-
-
 ## Features
 
 - [x] Auto Filter
