@@ -32,17 +32,17 @@ auth_channel = environ.get('AUTH_CHANNEL')
 auth_grp = environ.get('AUTH_GROUP')
 AUTH_CHANNEL = environ.get('AUTH_CHANNEL')
 AUTH_GROUPS = [int(ch) for ch in auth_grp.split()] if auth_grp else None
-FORCE_SUB1 = environ.get('FORCE_SUB1', 'https://t.me/+39HoQTJ4mhplYzhl')
-FORCE_SUB2 = environ.get('FORCE_SUB2', 'https://t.me/+nHE3X69W4i03NDJl')
+from os import environ
 
-# MongoDB information
+# Force Subscribe Channels
+FORCE_SUB_1 = environ.get('FORCE_SUB_1', 'https://t.me/+39HoQTJ4mhplYzhl')
+FORCE_SUB_2 = environ.get('FORCE_SUB_2', 'https://t.me/+nHE3X69W4i03NDJl')
+
+# MongoDB Configuration
 DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://batman13:batman13@batman.sawvl.mongodb.net/?retryWrites=true&w=majority&appName=batman")
 DATABASE_NAME = environ.get('DATABASE_NAME', "batman")
 COLLECTION_NAME = environ.get('COLLECTION_NAME', 'files')
 
-# Others
-FORCE_SUB_1 = environ.get('FORCE_SUB_1', 'https://t.me/+39HoQTJ4mhplYzhl')
-FORCE_SUB_2 = environ.get('FORCE_SUB_2', 'https://t.me/+nHE3X69W4i03NDJl')
 LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1002332361885'))
 SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'wudixh13')
 P_TTI_SHOW_OFF = is_enabled((environ.get('P_TTI_SHOW_OFF', 'True')), False)
