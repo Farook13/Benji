@@ -4,12 +4,11 @@ import os
 import asyncio
 from typing import Union, List
 from pyrogram import enums
-from pyrogram.types import Message, InlineKeyboardButton
+from pyrogram.types import Message
 from pyrogram.errors import InputUserDeactivated, UserNotParticipant, FloodWait, UserIsBlocked, PeerIdInvalid
 from imdb import IMDb
 from bs4 import BeautifulSoup
 import requests
-from datetime import datetime
 
 from info import AUTH_CHANNEL, LONG_IMDB_DESCRIPTION, MAX_LIST_ELM
 from database.users_chats_db import db
@@ -27,6 +26,7 @@ SMART_OPEN = '“'
 SMART_CLOSE = '”'
 START_CHAR = ('\'', '"', SMART_OPEN)
 
+
 class temp(object):
     BANNED_USERS = []
     BANNED_CHATS = []
@@ -37,6 +37,7 @@ class temp(object):
     U_NAME = None
     B_NAME = None
     SETTINGS = {}
+
 
 async def is_subscribed(bot, query):
     try:
@@ -49,6 +50,7 @@ async def is_subscribed(bot, query):
     except Exception as e:
         logger.exception(f"Unexpected error checking subscription status for user {query.from_user.id}: {e}")
     return False
+
 
 async def get_poster(query, bulk=False, id=False, file=None):
     if not id:
@@ -127,6 +129,7 @@ async def get_poster(query, bulk=False, id=False, file=None):
         'url': f'https://www.imdb.com/title/tt{movieid}'
     }
 
+
 async def broadcast_messages(user_id, message):
     while True:
         try:
@@ -149,6 +152,7 @@ async def broadcast_messages(user_id, message):
             logger.error(f"Error broadcasting to {user_id}: {e}")
             return False, "Error"
 
+
 async def search_gagala(text):
     usr_agent = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -162,6 +166,7 @@ async def search_gagala(text):
     titles = soup.find_all('h3')
     return [title.getText() for title in titles]
 
+
 async def get_settings(group_id):
     settings = temp.SETTINGS.get(group_id)
     if not settings:
@@ -169,24 +174,28 @@ async def get_settings(group_id):
         temp.SETTINGS[group_id] = settings
     return settings
 
+
 async def save_group_settings(group_id, key, value):
     current = await get_settings(group_id)
     current[key] = value
     temp.SETTINGS[group_id] = current
     await db.update_settings(group_id, current)
 
+
 def get_size(size):
     units = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB"]
     size = float(size)
     i = 0
-    while size >= 1024.0 and i < len(units)-1:
+    while size >= 1024.0 and i < len(units) - 1:
         size /= 1024.0
         i += 1
     return "%.2f %s" % (size, units[i])
 
+
 def split_list(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
+
 
 def get_file_id(msg: Message):
     if msg.media:
@@ -204,6 +213,7 @@ def get_file_id(msg: Message):
             if obj:
                 setattr(obj, "message_type", message_type)
                 return obj
+
 
 def extract_user(message: Message) -> Union[int, str]:
     user_id = None
@@ -227,7 +237,8 @@ def extract_user(message: Message) -> Union[int, str]:
     else:
         user_id = message.from_user.id
         user_first_name = message.from_user.first_name
-    return (user_id, user_first_name)
+    return user_id, user_first_name
+
 
 def list_to_str(k):
     if not k:
@@ -238,8 +249,26 @@ def list_to_str(k):
         k = k[:int(MAX_LIST_ELM)]
     return ', '.join(str(elem) for elem in k)
 
+
 def last_online(from_user):
-    time = ""
     if from_user.is_bot:
-        time += "🤖 Bot :("
-    elif from
+        return "🤖 Bot"
+    if from_user.status is None:
+        return "Unknown"
+    # from_user.status is a ChatMemberStatus or similar, we want the last seen time
+    # Unfortunately pyrogram User object does not expose last_online directly,
+    # so we often can't get this info without extra calls.
+    # So let's try to access the 'last_online_date' attribute if exists (pyrogram 2.x)
+    last_seen = getattr(from_user, "last_online_date", None)
+    if last_seen:
+        from datetime import datetime
+        delta = datetime.utcnow() - last_seen
+        if delta.days > 0:
+            return f"Last seen {delta.days} day(s) ago"
+        elif delta.seconds >= 3600:
+            return f"Last seen {delta.seconds // 3600} hour(s) ago"
+        elif delta.seconds >= 60:
+            return f"Last seen {delta.seconds // 60} minute(s) ago"
+        else:
+            return "Last seen just now"
+    return "Last seen info unavailable"
