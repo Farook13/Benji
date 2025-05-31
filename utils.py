@@ -272,3 +272,17 @@ def last_online(from_user):
         else:
             return "Last seen just now"
     return "Last seen info unavailable"
+
+def humanbytes(size):
+    """
+    Converts bytes into a human-readable format (B, KB, MB, GB, TB).
+    """
+    if not size:
+        return ""
+    power = 1024
+    n = 0
+    units = ["B", "KB", "MB", "GB", "TB"]
+    while size >= power and n < len(units) - 1:
+        size /= power
+        n += 1
+    return f"{round(size, 2)} {units[n]}"
