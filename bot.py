@@ -156,4 +156,10 @@ class Bot(Client):
 
 
 app = Bot()
+from pyrogram.types import Message
+from pyrogram import filters
+
+@app.on_message(filters.private & filters.text & ~filters.command([]))
+async def handle_user_messages(client, message: Message):
+    await message.reply("Hi! You sent a normal message.")
 app.run()
