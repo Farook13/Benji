@@ -119,7 +119,7 @@ class Bot(Client):
         )
         await message.reply_text(text, parse_mode="markdown")
 
-    @Client.on_message(filters.private & filters.text & ~filters.command)
+  @Client.on_message(filters.private & filters.text & ~filters.command([]))
     async def movie_details_handler(self, client, message):
         # Check subscription first
         subscribed = await is_subscribed(client, message)
