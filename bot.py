@@ -1,18 +1,18 @@
 import logging
 import logging.config
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from typing import Union, Optional, AsyncGenerator
 from datetime import date, datetime
 import pytz
 import asyncio
 
-# Logging config (your original)
+# Logging config
 logging.config.fileConfig('logging.conf')
 logging.getLogger().setLevel(logging.INFO)
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 logging.getLogger("imdbpy").setLevel(logging.ERROR)
-logging.getLogger("asyncio").setLevel(logging.CRITICAL -1)
+logging.getLogger("asyncio").setLevel(logging.CRITICAL - 1)
 
 import tgcrypto
 from pyrogram import Client, __version__
@@ -20,11 +20,10 @@ from pyrogram.raw.all import layer
 from database.ia_filterdb import Media
 from database.users_chats_db import db
 from info import SESSION, API_ID, API_HASH, BOT_TOKEN, LOG_STR, LOG_CHANNEL, AUTH_CHANNEL
-from utils import temp, is_subscribed, get_poster  # <-- added these utils
-from pyrogram import types
+from utils import temp, is_subscribed, get_poster
 from Script import script
 
-# peer id invalid fix
+# Fix for Peer ID invalid
 from pyrogram import utils as pyroutils
 pyroutils.MIN_CHAT_ID = -999999999999
 pyroutils.MIN_CHANNEL_ID = -100999999999999
@@ -60,25 +59,25 @@ class Bot(Client):
         temp.U_NAME = me.username
         temp.B_NAME = me.first_name
         self.username = '@' + me.username
-        logging.info(f"{me.first_name} with for Pyrogram v{__version__} (Layer {layer}) started on {me.username}.")
+        logging.info(f"{me.first_name} with Pyrogram v{__version__} (Layer {layer}) started on {me.username}.")
         logging.info(LOG_STR)
         await self.send_message(chat_id=LOG_CHANNEL, text=script.RESTART_TXT)
-        print("Goutham SER own Bot</>")
 
         tz = pytz.timezone('Asia/Kolkata')
         today = date.today()
         now = datetime.now(tz)
         time = now.strftime("%H:%M:%S %p")
         await self.send_message(chat_id=LOG_CHANNEL, text=script.RESTART_GC_TXT.format(today, time))
+
         client = webserver.AppRunner(await bot_run())
         await client.setup()
         bind_address = "0.0.0.0"
         await webserver.TCPSite(client, bind_address, int(PORT_CODE)).start()
 
-        # Register handlers after startup
-        self.add_handler(self.start_handler)
-        self.add_handler(self.help_handler)
-        self.add_handler(self.movie_details_handler)
+        # Add message handlers
+        self.add_handler(filters.command("start") & filters.private, self.start_handler)
+        self.add_handler(filters.command("help") & filters.private, self.help_handler)
+        self.add_handler(filters.private & filters.text & ~filters.command([]), self.movie_details_handler)
 
     async def stop(self, *args):
         await super().stop()
@@ -89,7 +88,7 @@ class Bot(Client):
         chat_id: Union[int, str],
         limit: int,
         offset: int = 0,
-    ) -> Optional[AsyncGenerator["types.Message", None]]:
+    ) -> Optional[AsyncGenerator["Message", None]]:
         current = offset
         while True:
             new_diff = min(200, limit - current)
@@ -100,17 +99,16 @@ class Bot(Client):
                 yield message
                 current += 1
 
-    # Handler definitions below
-    @Client.on_message(filters.command("start") & filters.private)
-    async def start_handler(self, client, message):
+    # === Handler methods ===
+
+    async def start_handler(self, client, message: Message):
         text = (
             "👋 Hello! Welcome to the bot.\n\n"
             "You can send me an IMDb movie name or ID to get details."
         )
         await message.reply_text(text)
 
-    @Client.on_message(filters.command("help") & filters.private)
-    async def help_handler(self, client, message):
+    async def help_handler(self, client, message: Message):
         text = (
             "ℹ️ *Help Menu*\n\n"
             "• Send me a movie name or IMDb ID to get details.\n"
@@ -119,8 +117,7 @@ class Bot(Client):
         )
         await message.reply_text(text, parse_mode="markdown")
 
-  @Client.on_message(filters.private & filters.text & ~filters.command([]))
-    async def movie_details_handler(self, client, message):
+    async def movie_details_handler(self, client, message: Message):
         # Check subscription first
         subscribed = await is_subscribed(client, message)
         if not subscribed:
@@ -156,10 +153,4 @@ class Bot(Client):
 
 
 app = Bot()
-from pyrogram.types import Message
-from pyrogram import filters
-
-@app.on_message(filters.private & filters.text & ~filters.command([]))
-async def handle_user_messages(client, message: Message):
-    await message.reply("Hi! You sent a normal message.")
 app.run()
