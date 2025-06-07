@@ -878,6 +878,23 @@ async def advantage_spell_chok(client, msg):
     await spell_check_del.delete()
 
 #SPELL CHECK END
+from pyrogram import Client, filters
+from pyrogram.types import CallbackQuery
+from info import PROTECT_CONTENT
+
+@Client.on_callback_query(filters.regex("^file#"))
+async def send_file(client, query: CallbackQuery):
+    try:
+        file_id = query.data.split("#", 1)[1]
+        await query.message.reply_cached_media(
+            file_id,
+            protect_content=PROTECT_CONTENT,
+            reply_to_message_id=query.message.id
+        )
+        await query.answer()
+    except Exception as e:
+        await query.answer("❌ Failed to send file", show_alert=True)
+        logger.exception(e)
 
 async def manual_filters(client, message, text=False):
     group_id = message.chat.id
